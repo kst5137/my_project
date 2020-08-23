@@ -34,7 +34,6 @@
 
             body {
                 background-color: whitesmoke;
-                margin-left: 20px;
                 overflow: scroll
             }
 
@@ -60,6 +59,14 @@
                 width: 700px;
                 margin: 20px auto;
             }
+            h3 {
+                margin: 20px auto;
+
+            }
+
+            h1 {
+                padding: 50px;
+            }
 
             .img {
                 background-image: url("https://lh5.googleusercontent.com/p/AF1QipOsYXwcUtNdoKlhRO8xnc8B3MbcZHI9byD2YbLv=w213-h160-k-no");
@@ -77,7 +84,7 @@
                 height: 150px;
                 float: left;
                 margin-left: 20px;
-            "
+
             }
 
             .map {
@@ -149,6 +156,8 @@
             }
 
 
+
+
         </style>
 
         <script>
@@ -158,30 +167,29 @@
     </head>
     <body>
 
-        <div class="head_top"
-             onclick="location.href='http://localhost:63342/sparta/%EC%9A%B0%EB%B3%B4%EC%8B%9D/templates/template.html?_ijt=cv5hpsp9rjh8kqcrnv2dkk7nsj'">
-            <h1 style="cursor:pointer">우<span style="font-size:20px">리가</span>보<span
+        <div class="head_top">
+            <h1 onclick="location.href='http://localhost:63342/sparta/%EC%9A%B0%EB%B3%B4%EC%8B%9D/templates/template.html?_ijt=cv5hpsp9rjh8kqcrnv2dkk7nsj'" style="cursor:pointer">우<span style="font-size:20px">리가</span>보<span
                     style="font-size:20px">장하는</span>식<span
                     style="font-size:20px">당</span></h1>
-        </div>
 
-        <div class="head_part">
-            <h2> 검색하고 싶은 가게를 입력해주세요</h2>
-            <div class="form-group">
-                <input type="text" class="form-control" id="search" placeholder="검색란(가게 이름)">
-                <!--                <input id="query" name="query" type="text" title="검색어 입력" maxlength="255" class="input_text" tabindex="1" accesskey="s" style="ime-mode:active;" autocomplete="off" onclick="document.getElementById('fbm').value=1;" value="">-->
-                <!--                <input type="text" id="nx_query" name="query" class="box_window" maxlength="255" accesskey="s" value="교촌치킨" autocomplete="off" title="검색어 입력">-->
+            <div class="head_part">
+                <h2> 검색하고 싶은 가게를 입력해주세요</h2>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="search" placeholder="검색란(가게 이름)">
+                    <!--                <input id="query" name="query" type="text" title="검색어 입력" maxlength="255" class="input_text" tabindex="1" accesskey="s" style="ime-mode:active;" autocomplete="off" onclick="document.getElementById('fbm').value=1;" value="">-->
+                    <!--                <input type="text" id="nx_query" name="query" class="box_window" maxlength="255" accesskey="s" value="교촌치킨" autocomplete="off" title="검색어 입력">-->
+                </div>
+                <p></p>
+                <p></p>
+                <div class="search">
+                    <button onclick="window.open('https://search.naver.com/search.naver?sm=top_hty&fbm=1&ie=utf8&query=$(`#search').val()"
+                            type="button" class="btn btn-primary">검색
+                    </button>
+                    <!--                <button onclick="restaurant()" type="button" class="btn btn-primary">검색</button>-->
+                </div>
+                <ul id="mise-info">
+                </ul>
             </div>
-            <p></p>
-            <p></p>
-            <div class="search">
-                <button onclick="window.open('https://search.naver.com/search.naver?sm=top_hty&fbm=1&ie=utf8&query=$(`#search').val()"
-                        type="button" class="btn btn-primary">검색
-                </button>
-                <!--                <button onclick="restaurant()" type="button" class="btn btn-primary">검색</button>-->
-            </div>
-            <ul id="mise-info">
-            </ul>
         </div>
 
         <div class="midcontent">

@@ -59,15 +59,66 @@
         </style>
 
         <script>
-            function search() {
-                let search = $('#search').val()
+            function showStar() {
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/list',
+                    data: {},
+                    success: function (response) {
+                        if (response['result'] == 'success') {
+                            let mystars = response['mystars'];
+                            for (let i = 0; i < mystars.length; i++) {
+                                let img_url = mystars[i]['img_url'];
+                                let name = mystars[i]['name'];
+                                let url = mystars[i]['url'];
+                                let like = mystars[i]['like'];
+                                let recent = mystars[i]['recent'];
+
+                                let temphtml = `<div class="card">
+                <div class="card-content">
+                    <div class="media">
+                        <div class="media-left">
+                            <figure class="image is-48x48">
+                                <img
+                                        src="${img_url}"
+                                        alt="Placeholder image"
+                                />
+                            </figure>
+                        </div>
+                        <div class="media-content">
+                            <a href="${url}" target="_blank" class="star-name title is-4">${name} (좋아요: ${like})</a>
+                            <p class="subtitle is-6">${recent}</p>
+                        </div>
+                    </div>
+                </div>
+                <footer class="card-footer">
+                    <a href="#" onclick="likeStar('${name}')" class="card-footer-item has-text-info">
+                        위로!
+                        <span class="icon">
+              <i class="fas fa-thumbs-up"></i>
+            </span>
+                    </a>
+                    <a href="#" onclick="deleteStar('${name}')" class="card-footer-item has-text-danger">
+                        삭제
+                        <span class="icon">
+              <i class="fas fa-ban"></i>
+            </span>
+                    </a>
+                </footer>
+            </div>`
+                                $('#star-box').append(temphtml)
+                            }
+                        }
+                    }
+                });
+            }
 
             function restaurant() {
                 // 여기에 코드를 입력하세요
                 $('#mise-info').empty();
                 $.ajax({
                     type: "GET",
-                    url: "http://openapi.seoul.go.kr:8088/6d4d776b466c656533356a4b4b5872/json/RealtimeCityAir/1/99",
+                    url: "https://dapi.kakao.com/v2/local/search/keyword.json?",
                     data: {},
                     success: function (response) {
                         let rows = response["RealtimeCityAir"]["row"];
@@ -92,9 +143,8 @@
     </head>
 
     <body>
-    <div class="head_top"
-        onclick="location.href='http://localhost:63342/sparta/%EC%9A%B0%EB%B3%B4%EC%8B%9D/templates/template.html?_ijt=cv5hpsp9rjh8kqcrnv2dkk7nsj'">
-            <h1 style="cursor:pointer">우<span style="font-size:20px">리가</span>보<span style="font-size:20px">장하는</span>식<span
+    <div class="head_top">
+            <h1 onclick="location.href='http://localhost:63342/sparta/%EC%9A%B0%EB%B3%B4%EC%8B%9D/templates/template.html?_ijt=cv5hpsp9rjh8kqcrnv2dkk7nsj'" style="cursor:pointer">우<span style="font-size:20px">리가</span>보<span style="font-size:20px">장하는</span>식<span
                     style="font-size:20px">당</span></h1>
 
         <div class="head_part">
@@ -106,8 +156,12 @@
             </div>
             <p></p>
             <p></p>
+<!--            <div class="search">-->
+<!--                <button onclick="window.open('https://search.naver.com/search.naver?sm=top_hty&fbm=1&ie=utf8&query=$(`#search').val()" type="button" class="btn btn-primary">검색</button>-->
+<!--&lt;!&ndash;                <button onclick="restaurant()" type="button" class="btn btn-primary">검색</button>&ndash;&gt;-->
+<!--            </div>-->
             <div class="search">
-                <button onclick="window.open('https://search.naver.com/search.naver?sm=top_hty&fbm=1&ie=utf8&query=$(`#search').val()" type="button" class="btn btn-primary">검색</button>
+                <button onclick="search()" type="button" class="btn btn-primary">검색</button>
 <!--                <button onclick="restaurant()" type="button" class="btn btn-primary">검색</button>-->
             </div>
             <ul id="mise-info">
