@@ -2,6 +2,8 @@
 <html lang="ko">
 
     <head>
+
+
         <!-- Required meta tags -->
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -19,6 +21,8 @@
 
         <!-- 구글폰트 -->
         <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+
+        <meta charset="utf-8">
 
 
         <title>스파르타코딩클럽 | 나홀로 메모장</title>
@@ -161,11 +165,23 @@
         </style>
 
         <script>
+var mapContainer = document.getElementById('map'), // 지도를 표시할 div
+    mapOption = {
+        center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
+        level: 3 // 지도의 확대 레벨
+    };
+
+// 지도를 표시할 div와  지도 옵션으로  지도를 생성합니다
+var map = new kakao.maps.Map(mapContainer, mapOption);
 
         </script>
 
     </head>
     <body>
+        !-- 지도를 표시할 div 입니다 -->
+<div id="map" style="width:100%;height:350px;"></div>
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=발급받은 APP KEY를 사용하세요"></script>
 
         <div class="head_top">
             <h1 onclick="location.href='http://localhost:63342/sparta/%EC%9A%B0%EB%B3%B4%EC%8B%9D/templates/template.html?_ijt=cv5hpsp9rjh8kqcrnv2dkk7nsj'" style="cursor:pointer">우<span style="font-size:20px">리가</span>보<span
