@@ -181,16 +181,54 @@
                 $(e).after($("#midcontent"));
                 $("#midcontent").show();
 
-                let name = $(e).find('.name').text()
-                $('#midcontent .headline h2').text(name)
-                let address = $(e).find('.addr').text()
-                $('#midcontent .address').text(address)
-                let phone = $(e).find('.phone').text()
-                $('#midcontent .num').text(phone)
+                let name1 = $(e).find('.name').text()
+                $('#midcontent .headline h2').text(name1)
+                let address1 = $(e).find('.addr').text()
+                $('#midcontent .address').text(address1)
+                let phone1 = $(e).find('.phone').text()
+                $('#midcontent .num').text(phone1)
 
-                let id = $(e).find('.id').val();
-                let x = $(e).find('.xval').val();
-                let y = $(e).find('.yval').val();
+                let id1 = $(e).find('.id').val();
+                let x1 = $(e).find('.xval').val();
+                let y1 = $(e).find('.yval').val();
+
+
+                $.ajax({
+                    type: "Post",
+                    url: "/review",
+                    data: {
+                        name_give: name1,
+                        address_give: address1,
+                        phone_give: phone1,
+                        id_give: id1,
+                        x_give: x1,
+                        Y_give: y1
+                    },
+                    success: function (response) {
+                        if (response["result"] == "success") {
+
+                        }
+
+                    }
+                })
+                $.ajax({
+                    type: "GET",
+                    url: "/review",
+                    data: {},
+                    success: function (response) {
+                        // 2. 요청 성공 여부 확인하기
+                        if (response["result"] == "success") {
+                            let reviews = response["reviews"];
+                            // 3. 요청 성공했을 때 리뷰를 올바르게 화면에 나타내기
+                            for (let i = 0; i < reviews.length; i++) {
+                                make(reviews[i]["name"], reviews[i]["address"], reviews[i]["phone"], reviews[i]["id"], reviews[i]["x"], reviews[i]["y"],);
+                            }
+                        } else {
+                            alert("리뷰를 받아오지 못했습니다");
+                        }
+                    }
+                })
+
 
                 // // 이동할 위도 경도 위치를 생성합니다
                 // var moveLatLon = new kakao.maps.LatLng(y, x);
@@ -206,14 +244,14 @@
                 // marker.setMap(map);
                 var mapContainer = document.getElementById('map'), // 지도를 표시할 div
                     mapOption = {
-                        center: new kakao.maps.LatLng(y, x), // 지도의 중심좌표
+                        center: new kakao.maps.LatLng(y1, x1), // 지도의 중심좌표
                         level: 5 // 지도의 확대 레벨
                     };
 
                 // 지도를 표시할 div와  지도 옵션으로  지도를 생성합니다
                 var map = new kakao.maps.Map(mapContainer, mapOption);
                 // 마커가 표시될 위치입니다
-                var markerPosition = new kakao.maps.LatLng(y, x);
+                var markerPosition = new kakao.maps.LatLng(y1, x1);
 
                 // 마커를 생성합니다
                 var marker = new kakao.maps.Marker({
@@ -225,7 +263,28 @@
 
             }
 
+            function make(name, address, phone, id, x, y) {
+                let name1 = $(e).find('.name').text()
+                $('#midcontent .headline h2').text(name1)
+                let address1 = $(e).find('.addr').text()
+                $('#midcontent .address').text(address1)
+                let phone1 = $(e).find('.phone').text()
+                $('#midcontent .num').text(phone1)
 
+                let id1 = $(e).find('.id').val();
+                let x1 = $(e).find('.xval').val();
+                let y1 = $(e).find('.yval').val();
+                let info = `<tr style="cursor:pointer" onclick="openClose(this)">
+                                            <input type="hidden" class="id" value="${id1}">
+                                            <input type="hidden" class="xval" value="${x1}">
+                                            <input type="hidden" class="yval" value="${y1}">
+                                            <td style="padding: 20px" class="name">${name1}</td>
+                                            <td style="padding: 20px" class="addr">${address1}</td>
+                                            <td style="padding: 20px" class="phone">${phone1}</td>
+                                        </tr>`
+
+                $('#orders-box').append(info);
+            }
 
 
             function restaurant() {
@@ -238,7 +297,10 @@
                     headers: {'Authorization': 'KakaoAK 9744b0d293119837b040ed5eab047a75'},
                     url: "https://dapi.kakao.com/v2/local/search/keyword.json",
                     // data: {query: q, page: 2},
-                    data: {query: q},
+                    data: {
+                        query: q,
+
+                    },
                     success: function (response) {
                         let document = response["documents"];
                         for (let i = 0; i < document.length; i++) {
@@ -248,7 +310,7 @@
                             let road_address_name = place["road_address_name"];
                             let phone = place["phone"];
                             let x = place["x"];
-                            let y = place["y"]
+                            let y = place["y"];
                             let info = `<tr style="cursor:pointer" onclick="openClose(this)">
                                             <input type="hidden" class="id" value="${id}">
                                             <input type="hidden" class="xval" value="${x}">
@@ -259,6 +321,8 @@
                                         </tr>`
 
                             $('#orders-box').append(info);
+
+
                         }
                     }
                 })

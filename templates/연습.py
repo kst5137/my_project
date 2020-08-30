@@ -1,53 +1,29 @@
+from pymongo import MongoClient
+
+client = MongoClient('localhost', 27017)
+db = client.dbsparta
+
 import requests
-import json    # 파이썬 기본 모듈
-import urllib  # 파이썬 기본 모듈
-import pandas as pd
-from pandas import DataFrame
+from bs4 import BeautifulSoup
 
-api_key = "9744b0d293119837b040ed5eab047a75"
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
 
-user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36"
-session = requests.Session()
-session.headers.update( {'User-agent': user_agent, 'referer': None, 'Authorization': 'KakaoAK ' + api_key} )
+data = requests.get('https://place.map.kakao.com/26602826', headers=headers)
+soup = BeautifulSoup(data.text, 'html.parser')
 
-url_tpl = "https://dapi.kakao.com/v3/search/book"
+trs = soup.select('#mArticle > div.cont_essential > div:nth-child(1) > div.place_details > div > div > a:nth-child(3) > span.color_b')
+#mArticle > div.cont_essential > div:nth-child(1) > div.place_details > div > div > a:nth-child(3) > span.color_b
+#print(trs)
 
-q = "파이썬"    # 검색어
-page = 1       # 접근할 페이지 번호(1~50)
-size = 50      # 가져올 데이터 수 (1~80)
+for tr in trs:
+        rank = tr.select_one('a:nth-child(3) > span.color_b').text[0:2].strip()
 
-# 수집결과가 누적될 빈 리스트
-documents = []
+        print(rank)
 
-# 상위 100건을 가져오기 위해서는 한 페이지당 50건씩 2 페이지의 분량을 수집해야 한다.
-for i in range(0, 2):
-    # 페이지 번호 변수 준비
-    page = i + 1
-
-    # API에 전달할 파라미터
-    params = {"page": page, "size": size, "query": q}
-    query = urllib.parse.urlencode(params)
-    # print(query)
-
-    # 최종 접속 주소 구성하기
-    api_url = url_tpl + "?" + query
-    # print(api_url)
-
-    # API 결과 가져오기
-    r = session.get(api_url)
-
-    if r.status_code != 200:
-        print("[%d Error] %s" % (r.status_code, r.reason))
-        quit()
-
-    # 수집결과를 JSON으로 변경
-    r.encoding = "utf-8"
-    book_dict = json.loads(r.text)
-
-    # 빈 리스트에 API에서 가져온 리스트를 병합
-    documents += book_dict['documents']
-
-
-    # 수집 결과를 데이터프레임으로 생성
-    책검색df = DataFrame(documents)
-    책검색df
+        # doc = {
+        #     'rank': rank,
+        #     'title': title,
+        #     'artist': artist,
+        #
+        # }
