@@ -193,24 +193,7 @@
                 let y1 = $(e).find('.yval').val();
 
 
-                $.ajax({
-                    type: "Post",
-                    url: "/review",
-                    data: {
-                        name_give: name1,
-                        address_give: address1,
-                        phone_give: phone1,
-                        id_give: id1,
-                        x_give: x1,
-                        Y_give: y1
-                    },
-                    success: function (response) {
-                        if (response["result"] == "success") {
 
-                        }
-
-                    }
-                })
                 $.ajax({
                     type: "GET",
                     url: "/review",
@@ -263,7 +246,7 @@
 
             }
 
-            function make(name, address, phone, id, x, y) {
+            function make(e,name, address, phone, id, x, y) {
                 let name1 = $(e).find('.name').text()
                 $('#midcontent .headline h2').text(name1)
                 let address1 = $(e).find('.addr').text()
@@ -275,12 +258,12 @@
                 let x1 = $(e).find('.xval').val();
                 let y1 = $(e).find('.yval').val();
                 let info = `<tr style="cursor:pointer" onclick="openClose(this)">
-                                            <input type="hidden" class="id" value="${id1}">
-                                            <input type="hidden" class="xval" value="${x1}">
-                                            <input type="hidden" class="yval" value="${y1}">
-                                            <td style="padding: 20px" class="name">${name1}</td>
-                                            <td style="padding: 20px" class="addr">${address1}</td>
-                                            <td style="padding: 20px" class="phone">${phone1}</td>
+                                            <input type="hidden" class="id" value="${id}">
+                                            <input type="hidden" class="xval" value="${x}">
+                                            <input type="hidden" class="yval" value="${y}">
+                                            <td style="padding: 20px" class="name">${name}</td>
+                                            <td style="padding: 20px" class="addr">${address}</td>
+                                            <td style="padding: 20px" class="phone">${phone}</td>
                                         </tr>`
 
                 $('#orders-box').append(info);
@@ -326,6 +309,37 @@
                         }
                     }
                 })
+
+                let name1 = $(e).find('.name').text()
+                $('#midcontent .headline h2').text(name1)
+                let address1 = $(e).find('.addr').text()
+                $('#midcontent .address').text(address1)
+                let phone1 = $(e).find('.phone').text()
+                $('#midcontent .num').text(phone1)
+
+                let id1 = $(e).find('.id').val();
+                let x1 = $(e).find('.xval').val();
+                let y1 = $(e).find('.yval').val();
+
+                $.ajax({
+                    type: "Post",
+                    url: "/review",
+                    data: {
+                        name_give: name1,
+                        address_give: address1,
+                        phone_give: phone1,
+                        id_give: id1,
+                        x_give: x1,
+                        Y_give: y1
+                    },
+                    success: function (response) {
+                        if (response["result"] == "success") {
+
+                        }
+
+                    }
+                })
+
             }
 
 
