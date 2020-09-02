@@ -2,6 +2,11 @@
 <html lang="ko">
 
     <head>
+
+        <meta property="og:title" content="우보식"/>
+        <meta property="og:description" content="내가 알고 싶은 식당의 평점을 한 눈에 볼 수 있는 페이지"/>
+        <meta property="og:image" content="{{ url_for('static', filename='ogimage.png') }}"/>
+
         <!-- Required meta tags -->
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -193,6 +198,32 @@
                 let y1 = $(e).find('.yval').val();
 
 
+                $.ajax({
+                    type: "GET",
+                    url: "https://place.map.kakao.com/"+id1,
+                    data: {
+                        query: id1,
+                    },
+                    success: function (response) {
+                        let comment = response["comments"];
+                        console.log(comment)
+                        // 반복문 패턴에서 배웠었죠? 모든 열 안의 데이터에 각각 접근하기
+                        for (let i = 0; i < comment.length; i++) {
+                            // 거치대 정류장 이름, 정류장의 거치대 수, 남은 자전거 수
+                            let scoresum = comment[i]['scoresum'];
+                            let scorecnt = comment[i]['scorecnt'];
+                            let info = `
+                                            <input type="hidden" class="scoresum" value="${scoresum}">
+                                            <input type="hidden" class="scorecnt" value="${scorecnt}">
+
+
+                                        `
+                            $('#daum').append(info);
+
+                            daumpoint(comment[i]['scoresum'], comment[i]['scorecnt'])
+                        }
+                    }
+                })
 
                 $.ajax({
                     type: "GET",
@@ -205,6 +236,7 @@
                             // 3. 요청 성공했을 때 리뷰를 올바르게 화면에 나타내기
                             for (let i = 0; i < reviews.length; i++) {
                                 make(reviews[i]["name"], reviews[i]["address"], reviews[i]["phone"], reviews[i]["id"], reviews[i]["x"], reviews[i]["y"],);
+
                             }
                         } else {
                             alert("리뷰를 받아오지 못했습니다");
@@ -246,17 +278,19 @@
 
             }
 
-            function make(e,name, address, phone, id, x, y) {
-                let name1 = $(e).find('.name').text()
-                $('#midcontent .headline h2').text(name1)
-                let address1 = $(e).find('.addr').text()
-                $('#midcontent .address').text(address1)
-                let phone1 = $(e).find('.phone').text()
-                $('#midcontent .num').text(phone1)
+            function daumpoint(scoresum, scorecnt) {
+                let score = `  <div class="daum_point">
+                            다음 평점 : ${scoresum}/${scorecnt}
+                            <p></p>
+                            <button onclick="daumpoint()" type="button" class="btn btn-primary">리뷰</button>
+                            <!--                    style="background-color:white"-->
+                </div>`
+                $('#daum').append(score)
 
-                let id1 = $(e).find('.id').val();
-                let x1 = $(e).find('.xval').val();
-                let y1 = $(e).find('.yval').val();
+            }
+
+            function make(name, address, phone, id, x, y) {
+
                 let info = `<tr style="cursor:pointer" onclick="openClose(this)">
                                             <input type="hidden" class="id" value="${id}">
                                             <input type="hidden" class="xval" value="${x}">
@@ -266,11 +300,12 @@
                                             <td style="padding: 20px" class="phone">${phone}</td>
                                         </tr>`
 
+
                 $('#orders-box').append(info);
             }
 
 
-            function restaurant() {
+            function restaurant(e) {
                 var q = $('#search').val()
                 // var q = "교촌치킨"
                 // 여기에 코드를 입력하세요
@@ -320,6 +355,10 @@
                 let id1 = $(e).find('.id').val();
                 let x1 = $(e).find('.xval').val();
                 let y1 = $(e).find('.yval').val();
+                let scoresum = $(e).find('.scoresum').val();
+                let scorecnt = $(e).find('.scorecnt').val();
+
+
 
                 $.ajax({
                     type: "Post",
@@ -330,7 +369,10 @@
                         phone_give: phone1,
                         id_give: id1,
                         x_give: x1,
-                        Y_give: y1
+                        Y_give: y1,
+                        scoresum_give: scoresum,
+                        scorecnt_give: scorecnt,
+
                     },
                     success: function (response) {
                         if (response["result"] == "success") {
@@ -339,6 +381,8 @@
 
                     }
                 })
+
+
 
             }
 
@@ -436,10 +480,10 @@
                             <p></p>
                             <button style="color:white" onclick="" type="button" class="btn btn-primary">리뷰</button>
                         </div>
-                        <div class="daum_point">
-                            다음 평점 : 4.8
+                        <div class="daum_point" id="daum">
+                            <p class="t">다음 평점</p>
                             <p></p>
-                            <button onclick="" type="button" class="btn btn-primary">리뷰</button>
+                            <button onclick="daumpoint()" type="button" class="btn btn-primary">리뷰</button>
                             <!--                    style="background-color:white"-->
                         </div>
                         <div style="clear:both"></div>
@@ -479,72 +523,72 @@
         </table>
 
 
-        <h3> 검색 top3</h3>
-        <hr>
-        <div class="card-deck">
-            <div class="card">
-                <img class="card-img-top" src="..." alt="Card image cap">
-                <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">This is a longer card with supporting text below as a natural lead-in to
-                        additional content. This content is a little bit longer.</p>
-                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-                </div>
-            </div>
-            <div class="card">
-                <img class="card-img-top" src="..." alt="Card image cap">
-                <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">This card has supporting text below as a natural lead-in to additional
-                        content.</p>
-                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-                </div>
-            </div>
-            <div class="card">
-                <img class="card-img-top" src="..." alt="Card image cap">
-                <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">This is a wider card with supporting text below as a natural lead-in to
-                        additional content. This card has even longer content than the first to show that equal
-                        height action.</p>
-                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-                </div>
-            </div>
-        </div>
+        <!--        <h3> 검색 top3</h3>-->
+        <!--        <hr>-->
+        <!--        <div class="card-deck">-->
+        <!--            <div class="card">-->
+        <!--                <img class="card-img-top" src="..." alt="Card image cap">-->
+        <!--                <div class="card-body">-->
+        <!--                    <h5 class="card-title">Card title</h5>-->
+        <!--                    <p class="card-text">This is a longer card with supporting text below as a natural lead-in to-->
+        <!--                        additional content. This content is a little bit longer.</p>-->
+        <!--                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--            <div class="card">-->
+        <!--                <img class="card-img-top" src="..." alt="Card image cap">-->
+        <!--                <div class="card-body">-->
+        <!--                    <h5 class="card-title">Card title</h5>-->
+        <!--                    <p class="card-text">This card has supporting text below as a natural lead-in to additional-->
+        <!--                        content.</p>-->
+        <!--                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--            <div class="card">-->
+        <!--                <img class="card-img-top" src="..." alt="Card image cap">-->
+        <!--                <div class="card-body">-->
+        <!--                    <h5 class="card-title">Card title</h5>-->
+        <!--                    <p class="card-text">This is a wider card with supporting text below as a natural lead-in to-->
+        <!--                        additional content. This card has even longer content than the first to show that equal-->
+        <!--                        height action.</p>-->
+        <!--                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </div>-->
 
 
-        <h3> 평점 top3</h3>
-        <hr>
-        <div class="card-deck">
-            <div class="card">
-                <img class="card-img-top" src="..." alt="Card image cap">
-                <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">This is a longer card with supporting text below as a natural lead-in to
-                        additional content. This content is a little bit longer.</p>
-                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-                </div>
-            </div>
-            <div class="card">
-                <img class="card-img-top" src="..." alt="Card image cap">
-                <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">This card has supporting text below as a natural lead-in to additional
-                        content.</p>
-                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-                </div>
-            </div>
-            <div class="card">
-                <img class="card-img-top" src="..." alt="Card image cap">
-                <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">This is a wider card with supporting text below as a natural lead-in to
-                        additional content. This card has even longer content than the first to show that equal
-                        height action.</p>
-                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-                </div>
-            </div>
-        </div>
+        <!--        <h3> 평점 top3</h3>-->
+        <!--        <hr>-->
+        <!--        <div class="card-deck">-->
+        <!--            <div class="card">-->
+        <!--                <img class="card-img-top" src="..." alt="Card image cap">-->
+        <!--                <div class="card-body">-->
+        <!--                    <h5 class="card-title">Card title</h5>-->
+        <!--                    <p class="card-text">This is a longer card with supporting text below as a natural lead-in to-->
+        <!--                        additional content. This content is a little bit longer.</p>-->
+        <!--                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--            <div class="card">-->
+        <!--                <img class="card-img-top" src="..." alt="Card image cap">-->
+        <!--                <div class="card-body">-->
+        <!--                    <h5 class="card-title">Card title</h5>-->
+        <!--                    <p class="card-text">This card has supporting text below as a natural lead-in to additional-->
+        <!--                        content.</p>-->
+        <!--                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--            <div class="card">-->
+        <!--                <img class="card-img-top" src="..." alt="Card image cap">-->
+        <!--                <div class="card-body">-->
+        <!--                    <h5 class="card-title">Card title</h5>-->
+        <!--                    <p class="card-text">This is a wider card with supporting text below as a natural lead-in to-->
+        <!--                        additional content. This card has even longer content than the first to show that equal-->
+        <!--                        height action.</p>-->
+        <!--                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </div>-->
 
 
     </body>
