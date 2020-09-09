@@ -71,19 +71,18 @@
                 padding: 50px;
             }
 
-            .img {
-                background-image: url("https://lh5.googleusercontent.com/p/AF1QipOsYXwcUtNdoKlhRO8xnc8B3MbcZHI9byD2YbLv=w213-h160-k-no");
+            .imgurl {
                 background-position: center;
                 background-size: cover;
-                width: 15%;
+                width: 25%;
                 height: 150px;
-                border: 1px solid black;
                 float: left;
-
+                border: 1px solid black;
             }
 
+
             .numaddr {
-                width: 60%;
+                width: 50%;
                 height: 150px;
                 float: left;
                 margin-left: 20px;
@@ -109,8 +108,7 @@
                 float: left;
                 margin-left: 30px;
                 padding: 20px;
-                overflow: scroll;
-                white-space: normal;
+                
             }
 
             .naver_point {
@@ -151,7 +149,7 @@
             }
 
             .reviews {
-                margin: 20px;
+
                 border: 1px solid black;
                 padding: 10px;
 
@@ -164,12 +162,29 @@
         <script>
             $(document).ready(function () {
                 // index.html 로드가 완료되면 자동으로 showStar() 함수를 호출합니다.
-                hide();
+                hidemidcontent()
+                // hidereview()
             });
 
-            function hide() {
+            function hidemidcontent() {
                 $("#midcontent").hide();
             }
+
+            function hidereview() {
+                $('#reviews').hide();
+
+            }
+
+            function daumreviewopen() {
+                $('#reviews').open
+
+            }
+
+            function reviewclose() {
+                $('#reviews').hide()
+
+            }
+
 
             function onlyclose() {
                 // // if ($("#midcontent").css("display") == "block") {
@@ -186,35 +201,98 @@
                 $(e).after($("#midcontent"));
                 $("#midcontent").show();
 
+                $('#daum').empty();
+                $('#reviews').empty()
+                $('#imgurl').empty()
+
                 let name1 = $(e).find('.name').text()
                 $('#midcontent .headline h2').text(name1)
                 let address1 = $(e).find('.addr').text()
                 $('#midcontent .address').text(address1)
                 let phone1 = $(e).find('.phone').text()
                 $('#midcontent .num').text(phone1)
+                let photo1 = $(e).find('.photo').text()
+                $('#midcontent .img').text(photo1)
 
                 let id1 = $(e).find('.id').val();
                 let x1 = $(e).find('.xval').val();
                 let y1 = $(e).find('.yval').val();
 
 
-
-
                 $.ajax({
                     type: "GET",
-                    url: "/review",
-                    data: {},
+                    url: "/kakao_review",
+                    data: {
+                        query: id1,
+                    },
                     success: function (response) {
-                        // 2. 요청 성공 여부 확인하기
-                        if (response["result"] == "success") {
-                            let reviews = response["reviews"];
-                            // 3. 요청 성공했을 때 리뷰를 올바르게 화면에 나타내기
-                            for (let i = 0; i < reviews.length; i++) {
-                                make(reviews[i]["name"], reviews[i]["address"], reviews[i]["phone"], reviews[i]["id"], reviews[i]["x"], reviews[i]["y"],);
+                        let data = response["data"];
+                        let comment = data['comment']
+                        let basicinfo = data['basicInfo']
+                        let photo = basicinfo['mainphotourl']
+                        let scoresum = comment['scoresum'];
+                        let scorecnt = comment['scorecnt'];
+                        let rate = scoresum / scorecnt
+                        let rate2 = rate.toFixed(2)
+                        let info =
+                            `<p class = "daumrate"> 다음평점 : ${rate2} </p>`
+// <!--                             <button style="color:white" onclick="daumreview()" type="button" class="btn btn-primary">리뷰보기</button>-->`
+                        $('#daum').append(info);
 
+
+                        let photo2 =
+                            `<div>
+                        <img class="card-img-top"
+                             id="imgurl"
+                             src="${photo}"
+                             alt="Card image cap">
+                            </div>`
+                        $('#imgurl').append(photo2)
+
+
+                        let list = comment['list']
+                        for (let i = 0; i < list.length; i++) {
+                            let username = comment['list'][i]['username']
+                            let point = comment['list'][i]['point']
+                            let review = comment['list'][i]['contents']
+                            let date = comment['list'][i]['date']
+                            if (review == '') {
+                                review = "리뷰 없음"
+                            } else {
+                                review = comment['list'][i]['contents']
                             }
-                        } else {
-                            alert("리뷰를 받아오지 못했습니다");
+                            // console.log(username, point, review)
+                            let reviewinfo = `<div class="reviews" id="reviews">
+                        <div class="reviewinf" >
+                            <div class="reviewrname" style="float: left">이름 : ${username}</div>
+                            <div class="review_rate" style="float: left; padding-left: 20px;">별점 : ${point}</div>
+                            <div class="review_date" style="float: left; padding-left: 20px;"> 작성 날짜 : ${date} </div>
+                        </div>
+                        <br>
+                        <div class="reviewcon">
+                             <div class="reviewcontent" style="text-align: left"> 리뷰: ${review}</div>
+                        </div>
+                    </div>`
+                            $('#reviews').append(reviewinfo)
+
+                        }
+                        // }
+
+                        // 반복문 패턴에서 배웠었죠? 모든 열 안의 데이터에 각각 접근하기
+                        for (let i = 0; i < comment.length; i++) {
+                            // 거치대 정류장 이름, 정류장의 거치대 수, 남은 자전거 수
+                            let scoresum = comment[i]['scoresum'];
+                            let scorecnt = comment[i]['scorecnt'];
+                            let info = `
+                                            <input type="hidden" class="scoresum" value="${scoresum}">
+                                            <input type="hidden" class="scorecnt" value="${scorecnt}">
+
+
+                                        `
+                            $('#daum').append(info);
+
+
+                            daumpoint(comment[i]['scoresum'], comment[i]['scorecnt'])
                         }
                     }
                 })
@@ -253,32 +331,6 @@
 
             }
 
-            function daumpoint(scoresum, scorecnt) {
-                let score = `  <div class="daum_point">
-                            다음 평점 : ${scoresum}/${scorecnt}
-                            <p></p>
-                            <button onclick="daumpoint()" type="button" class="btn btn-primary">리뷰</button>
-                            <!--                    style="background-color:white"-->
-                </div>`
-                $('#daum').append(score)
-
-            }
-
-            function make(name, address, phone, id, x, y) {
-
-                let info = `<tr style="cursor:pointer" onclick="openClose(this)">
-                                            <input type="hidden" class="id" value="${id}">
-                                            <input type="hidden" class="xval" value="${x}">
-                                            <input type="hidden" class="yval" value="${y}">
-                                            <td style="padding: 20px" class="name">${name}</td>
-                                            <td style="padding: 20px" class="addr">${address}</td>
-                                            <td style="padding: 20px" class="phone">${phone}</td>
-                                        </tr>`
-
-
-                $('#orders-box').append(info);
-            }
-
 
             function restaurant(e) {
                 var q = $('#search').val()
@@ -296,6 +348,7 @@
                     },
                     success: function (response) {
                         let document = response["documents"];
+                        console.log(document)
                         for (let i = 0; i < document.length; i++) {
                             let place = document[i]
                             let id = place['id'];
@@ -319,44 +372,6 @@
                         }
                     }
                 })
-
-                let name1 = $(e).find('.name').text()
-                $('#midcontent .headline h2').text(name1)
-                let address1 = $(e).find('.addr').text()
-                $('#midcontent .address').text(address1)
-                let phone1 = $(e).find('.phone').text()
-                $('#midcontent .num').text(phone1)
-
-                let id1 = $(e).find('.id').val();
-                let x1 = $(e).find('.xval').val();
-                let y1 = $(e).find('.yval').val();
-                let scoresum = $(e).find('.scoresum').val();
-                let scorecnt = $(e).find('.scorecnt').val();
-
-
-
-                $.ajax({
-                    type: "Post",
-                    url: "/review",
-                    data: {
-                        name_give: name1,
-                        address_give: address1,
-                        phone_give: phone1,
-                        id_give: id1,
-                        x_give: x1,
-                        Y_give: y1,
-                        scoresum_give: scoresum,
-                        scorecnt_give: scorecnt,
-
-                    },
-                    success: function (response) {
-                        if (response["result"] == "success") {
-
-                        }
-
-                    }
-                })
-
 
 
             }
@@ -410,85 +425,77 @@
                 <td colspan="3">
                     <div class="headline">
                         <h2> 굴다리 소곱창(내가 입력한 가게) </h2>
-                        <div class="img">
-                        </div>
-                        <div class="numaddr" style="border: 1px solid black;">
-                            <div class="address">주소 : 서울특별시 용산구 청파동 청파로 269-1</div>
-                            <div class="num"> 010-2222-2222</div>
-                        </div>
+                    </div>
+                    <div class="imgurl" id="imgurl">
+                        <img src="https://lh5.googleusercontent.com/p/AF1QipOsYXwcUtNdoKlhRO8xnc8B3MbcZHI9byD2YbLv=w213-h160-k-no"
+                             alt="Card image cap">
+                    </div>
+
+                    <div class="numaddr" style="border: 1px solid black;">
+                        <div class="address">주소 : 서울특별시 용산구 청파동 청파로 269-1</div>
+                        <div class="num"> 010-2222-2222</div>
+                    </div>
 
 
-                        <div id="map"></div>
-                        <script type="text/javascript"
-                                src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9744b0d293119837b040ed5eab047a75"></script>
-                        <script>
-                            var mapContainer = document.getElementById('map'), // 지도를 표시할 div
-                                mapOption = {
-                                    center: new kakao.maps.LatLng(37.51207412593136, 127.05902969025047), // 지도의 중심좌표
-                                    level: 5 // 지도의 확대 레벨
-                                };
+                    <div id="map"></div>
+                    <script type="text/javascript"
+                            src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9744b0d293119837b040ed5eab047a75"></script>
+                    <script>
+                        var mapContainer = document.getElementById('map'), // 지도를 표시할 div
+                            mapOption = {
+                                center: new kakao.maps.LatLng(37.51207412593136, 127.05902969025047), // 지도의 중심좌표
+                                level: 5 // 지도의 확대 레벨
+                            };
 
-                            // 지도를 표시할 div와  지도 옵션으로  지도를 생성합니다
-                            var map = new kakao.maps.Map(mapContainer, mapOption);
-                            // 마커가 표시될 위치입니다
-                            var markerPosition = new kakao.maps.LatLng(37.51207412593136, 127.05902969025047);
+                        // 지도를 표시할 div와  지도 옵션으로  지도를 생성합니다
+                        var map = new kakao.maps.Map(mapContainer, mapOption);
+                        // 마커가 표시될 위치입니다
+                        var markerPosition = new kakao.maps.LatLng(37.51207412593136, 127.05902969025047);
 
-                            // 마커를 생성합니다
-                            var marker = new kakao.maps.Marker({
-                                position: markerPosition
-                            });
+                        // 마커를 생성합니다
+                        var marker = new kakao.maps.Marker({
+                            position: markerPosition
+                        });
 
-                            // 마커가 지도 위에 표시되도록 설정합니다
-                            marker.setMap(map);
-                        </script>
-                        <div style="clear:both"></div>
+                        // 마커가 지도 위에 표시되도록 설정합니다
+                        marker.setMap(map);
+                    </script>
+                    <div style="clear:both"></div>
                     </div>
                     <div class="midline">
-                        <div class="google_point">
-                            구글 평점 : 4.4
+                        <div class="google_point" id="google">
+                            <p class="googlerate">구글 평점 : 3.3 </p>
                             <p></p>
-
-                            <p>dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd</p>
+                            <!--                            <button style="color:white" onclick="daumreviewopen()" type="button"-->
+                            <!--                                    class="btn btn-primary">리뷰보기-->
+<!--                            </button>-->
+                            <!--                    style="background-color:white"-->
                         </div>
                         <div class="naver_point">
                             네이버 평점 : 4.9
                             <p></p>
-
+                            <!--                            <button style="color:white" onclick="" type="button" class="btn btn-primary">리뷰</button>-->
                         </div>
                         <div class="daum_point" id="daum">
-                            <p class="t">다음 평점</p>
+                            <p class="daumrate">다음 평점 : </p>
                             <p></p>
-                            <button onclick="daumpoint()" type="button" class="btn btn-primary">리뷰</button>
+                            <!--                            <button style="color:white" onclick="daumreviewopen()" type="button"-->
+                            <!--                                    class="btn btn-primary">리뷰보기-->
+<!--                            </button>-->
                             <!--                    style="background-color:white"-->
                         </div>
                         <div style="clear:both"></div>
                     </div>
-                    <div class="reviews">
-                        <div class="review">
-                            <p class="t">이름</p>
-                            <p class="a"> 리뷰: 이집의 장점을 막 잡은 생생함임</p>
-                            <hr>
-                        </div>
-                        <div class="review">
-                            <p class="t">이름</p>
-                            <p class="a"> 리뷰: 이집의 장점을 막 잡은 생생함임</p>
-                            <hr>
-                        </div>
-                        <div class="review">
-                            <p class="t">이름</p>
-                            <p class="a"> 리뷰: 이집의 장점을 막 잡은 생생함임</p>
-                            <hr>
-                        </div>
-                        <div class="review">
-                            <p class="t">이름</p>
-                            <p class="a"> 리뷰: 이집의 장점을 막 잡은 생생함임</p>
-                            <hr>
-                        </div>
-                        <div class="review">
-                            <p class="t">이름</p>
-                            <p class="a"> 리뷰: 이집의 장점을 막 잡은 생생함임</p>
-                            <hr>
-                        </div>
+                    <div class="reviews" id="reviews">
+                        <!--                        <div class="reviewinf" style="border: 1px seagreen;">-->
+                        <!--                            <p class="reviewrname" style="float: left">이름 : </p>-->
+                        <!--                            <p class="review_rate" style="float: left; padding-left: 20px;">별점 : 3</p>-->
+                        <!--                            <p class="review_date" style="float: right"> 작성 날짜 : 2019-2-2 </p>-->
+                        <!--                        </div>-->
+                        <!--                        <div class="reviewcon">-->
+                        <!--                            <br>-->
+                        <!--                             <p class="reviewcontent"> 리뷰: 이집의 장점을 막 잡은 생생함임</p>-->
+                        <!--                        </div>-->
                     </div>
                     <div class=closebutton>
                         <button style=cursor:pointer onclick="onlyclose()" type="button" class="btn-primary">닫기</button>
